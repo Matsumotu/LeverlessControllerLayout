@@ -48,11 +48,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 60px;
-            height: 60px;
-            font-size: 16px;
             flex-shrink: 0;
-            position: relative;
+            position: absolute;
             touch-action: none;
         }
         /* ボタンコンテナ（横一列に固定、スクロール可能） */
@@ -90,6 +87,22 @@
     </div>
 
     <script>
+        function adjustSizes() {
+            let controller = document.getElementById('controller');
+            let buttons = document.querySelectorAll('.button');
+            let scaleFactor = controller.clientWidth / 950;
+            let size = Math.max(40, 70 * scaleFactor); // 最小サイズ40px, 拡縮対応
+            buttons.forEach(button => {
+                button.style.width = size + 'px';
+                button.style.height = size + 'px';
+                button.style.fontSize = (size * 0.4) + 'px';
+                button.style.borderRadius = '50%';
+            });
+        }
+        
+        window.addEventListener('resize', adjustSizes);
+        window.addEventListener('load', adjustSizes);
+        
         document.querySelectorAll('.button').forEach(button => {
             button.addEventListener('mousedown', startDrag);
             button.addEventListener('touchstart', startDrag);
