@@ -15,14 +15,14 @@
             background-color: #f4f4f4;
             margin: 0;
         }
-        /* コンテンツ全体のコンテナ設定 */
+        /* コンテンツ全体のコンテナ設定（中央揃え） */
         #container {
             width: 100vw;
-            height: 80vh;
+            height: 90vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
         }
         /* レバーレスコントローラーの画像を配置するエリア（中央揃え） */
         #controller {
@@ -105,6 +105,31 @@
         /* ウィンドウのサイズ変更時にボタンサイズを再調整 */
         window.addEventListener('resize', adjustSizes);
         window.addEventListener('load', adjustSizes);
+        
+        /* ドラッグ＆ドロップ機能を有効化 */
+        document.querySelectorAll('.button').forEach(button => {
+            button.addEventListener('dragstart', (event) => {
+                event.dataTransfer.setData('text/plain', event.target.id);
+                event.dataTransfer.effectAllowed = "move";
+            });
+        });
+
+        document.getElementById('controller').addEventListener('dragover', (event) => {
+            event.preventDefault();
+        });
+
+        document.getElementById('controller').addEventListener('drop', (event) => {
+            event.preventDefault();
+            let buttonId = event.dataTransfer.getData('text/plain');
+            let button = document.getElementById(buttonId);
+            let controllerRect = event.target.getBoundingClientRect();
+            button.style.left = (event.clientX - controllerRect.left - button.offsetWidth / 2) + 'px';
+            button.style.top = (event.clientY - controllerRect.top - button.offsetHeight / 2) + 'px';
+            button.style.position = 'absolute';
+            if (!controller.contains(button)) {
+                controller.appendChild(button);
+            }
+        });
     </script>
 </body>
 </html>
