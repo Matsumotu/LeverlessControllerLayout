@@ -43,6 +43,7 @@
             font-weight: bold;
             cursor: grab;
             position: absolute;
+            touch-action: none;
         }
         #buttons-container {
             width: 80%;
@@ -80,10 +81,31 @@
             event.preventDefault();
             let buttonId = event.dataTransfer.getData('text/plain');
             let button = document.getElementById(buttonId);
-            button.style.left = event.offsetX + 'px';
-            button.style.top = event.offsetY + 'px';
+            let rect = button.getBoundingClientRect();
+            let controllerRect = event.target.getBoundingClientRect();
+            button.style.left = (event.clientX - controllerRect.left - rect.width / 2) + 'px';
+            button.style.top = (event.clientY - controllerRect.top - rect.height / 2) + 'px';
             button.style.position = 'absolute';
             document.getElementById('controller').appendChild(button);
+        });
+
+        document.querySelectorAll('.button').forEach(button => {
+            button.addEventListener('touchstart', (event) => {
+                let touch = event.touches[0];
+                button.dataset.offsetX = touch.clientX - button.getBoundingClientRect().left;
+                button.dataset.offsetY = touch.clientY - button.getBoundingClientRect().top;
+            });
+
+            button.addEventListener('touchmove', (event) => {
+                event.preventDefault();
+                let touch = event.touches[0];
+                let controller = document.getElementById('controller');
+                let controllerRect = controller.getBoundingClientRect();
+                button.style.left = (touch.clientX - controllerRect.left - button.dataset.offsetX) + 'px';
+                button.style.top = (touch.clientY - controllerRect.top - button.dataset.offsetY) + 'px';
+                button.style.position = 'absolute';
+                controller.appendChild(button);
+            });
         });
     </script>
 </body>
