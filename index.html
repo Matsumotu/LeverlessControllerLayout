@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>レバーレスコントローラー設定</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #controller {
+            width: 300px;
+            height: 200px;
+            background: url('https://github.com/Matsumotu/LeverlessControllerLayout/blob/main/controller.png') no-repeat center center;
+            background-size: contain;
+            position: relative;
+            border: 2px solid #000;
+        }
+        .button {
+            width: 60px;
+            height: 60px;
+            background: lightblue;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 60px;
+            font-weight: bold;
+            cursor: grab;
+            position: absolute;
+        }
+        #buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controller"></div>
+    <div id="buttons-container">
+        <div class="button" draggable="true">弱</div>
+        <div class="button" draggable="true">中</div>
+        <div class="button" draggable="true">強</div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.button').forEach(button => {
+            button.addEventListener('dragstart', (event) => {
+                event.dataTransfer.setData('text/plain', event.target.innerText);
+            });
+        });
+
+        document.getElementById('controller').addEventListener('dragover', (event) => {
+            event.preventDefault();
+        });
+
+        document.getElementById('controller').addEventListener('drop', (event) => {
+            event.preventDefault();
+            let data = event.dataTransfer.getData('text/plain');
+            let newButton = document.createElement('div');
+            newButton.classList.add('button');
+            newButton.innerText = data;
+            newButton.style.left = event.offsetX + 'px';
+            newButton.style.top = event.offsetY + 'px';
+            newButton.style.position = 'absolute';
+            event.target.appendChild(newButton);
+        });
+    </script>
+</body>
+</html>
