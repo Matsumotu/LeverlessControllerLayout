@@ -12,14 +12,18 @@
             justify-content: center;
             height: 100vh;
             background-color: #f4f4f4;
+            margin: 0;
         }
         #controller {
             width: 300px;
             height: 200px;
-            background: url('https://github.com/Matsumotu/LeverlessControllerLayout/blob/main/controller.png') no-repeat center center;
+            background: url('controller.png') no-repeat center center;
             background-size: contain;
             position: relative;
             border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .button {
             width: 60px;
@@ -35,6 +39,7 @@
         #buttons-container {
             display: flex;
             justify-content: center;
+            gap: 10px;
             margin-top: 20px;
         }
     </style>
@@ -42,15 +47,15 @@
 <body>
     <div id="controller"></div>
     <div id="buttons-container">
-        <div class="button" draggable="true">弱</div>
-        <div class="button" draggable="true">中</div>
-        <div class="button" draggable="true">強</div>
+        <div class="button" id="weak" draggable="true">弱</div>
+        <div class="button" id="medium" draggable="true">中</div>
+        <div class="button" id="strong" draggable="true">強</div>
     </div>
 
     <script>
         document.querySelectorAll('.button').forEach(button => {
             button.addEventListener('dragstart', (event) => {
-                event.dataTransfer.setData('text/plain', event.target.innerText);
+                event.dataTransfer.setData('text/plain', event.target.id);
             });
         });
 
@@ -60,14 +65,12 @@
 
         document.getElementById('controller').addEventListener('drop', (event) => {
             event.preventDefault();
-            let data = event.dataTransfer.getData('text/plain');
-            let newButton = document.createElement('div');
-            newButton.classList.add('button');
-            newButton.innerText = data;
-            newButton.style.left = event.offsetX + 'px';
-            newButton.style.top = event.offsetY + 'px';
-            newButton.style.position = 'absolute';
-            event.target.appendChild(newButton);
+            let buttonId = event.dataTransfer.getData('text/plain');
+            let button = document.getElementById(buttonId);
+            button.style.left = event.offsetX + 'px';
+            button.style.top = event.offsetY + 'px';
+            button.style.position = 'absolute';
+            document.getElementById('controller').appendChild(button);
         });
     </script>
 </body>
