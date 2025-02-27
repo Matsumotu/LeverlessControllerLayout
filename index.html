@@ -34,14 +34,9 @@
             justify-content: center;
         }
         .button {
-            width: 7vw;
-            height: 7vw;
-            max-width: 60px;
-            max-height: 60px;
             background: lightblue;
             border-radius: 50%;
             text-align: center;
-            font-size: 1.2vw;
             font-weight: bold;
             cursor: grab;
             position: absolute;
@@ -75,11 +70,12 @@
         function adjustButtonSizes() {
             let controller = document.getElementById('controller');
             let buttons = document.querySelectorAll('.button');
+            let size = Math.min(controller.clientWidth * 0.1, controller.clientHeight * 0.1);
             buttons.forEach(button => {
-                let size = Math.min(controller.clientWidth * 0.07, controller.clientHeight * 0.07);
                 button.style.width = size + 'px';
                 button.style.height = size + 'px';
                 button.style.fontSize = (size * 0.4) + 'px';
+                button.style.borderRadius = '50%';
             });
         }
         
