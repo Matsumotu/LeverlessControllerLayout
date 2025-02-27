@@ -24,11 +24,11 @@
             align-items: center;
             justify-content: center;
         }
-        /* レバーレスコントローラーの画像を配置するエリア */
+        /* レバーレスコントローラーの画像を配置するエリア（中央揃え） */
         #controller {
-            width: 95%;
+            width: 95%; /* 画面のほぼ全幅を使う */
             height: auto;
-            aspect-ratio: 16 / 9;
+            aspect-ratio: 16 / 9; /* 比率を保持 */
             background: url('controller.png') no-repeat center center;
             background-size: contain;
             position: relative;
@@ -36,111 +36,130 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
-        /* ボタンの基本スタイル（適切なサイズと円形を維持） */
+        /* ボタンの基本スタイル（円形ボタン） */
         .button {
             background: lightblue;
-            border-radius: 50%;
+            border-radius: 50%; /* 完全な円形にする */
             text-align: center;
             font-weight: bold;
             cursor: grab;
+            position: absolute;
+            touch-action: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
-            position: absolute;
-            touch-action: none;
         }
-        /* ボタンコンテナ（横一列に固定、スクロール可能） */
+        /* ボタンコンテナ（初期配置用、複数段対応） */
         #buttons-container {
             width: 95%;
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
-            overflow-x: auto;
-            padding: 10px 0;
-            position: relative;
-            white-space: nowrap;
+            margin-top: 10px;
+        }
+        .button-initial {
+            position: static;
         }
     </style>
 </head>
 <body>
     <div id="container">
+        <!-- コントローラー画像エリア（中央揃え） -->
         <div id="controller"></div>
+        
+        <!-- 初期配置されるボタンエリア（複数段に対応） -->
         <div id="buttons-container">
-            <div class="button" id="weak">弱</div>
-            <div class="button" id="medium">中</div>
-            <div class="button" id="strong">強</div>
-            <div class="button" id="left">←</div>
-            <div class="button" id="down">↓</div>
-            <div class="button" id="right">→</div>
-            <div class="button" id="up">↑</div>
-            <div class="button" id="assist">アシスト</div>
-            <div class="button" id="sp">SP</div>
-            <div class="button" id="throw">投げ</div>
-            <div class="button" id="sa">SA</div>
-            <div class="button" id="extra1">その他1</div>
-            <div class="button" id="extra2">その他2</div>
+            <div class="button button-initial" id="weak" draggable="true">弱</div>
+            <div class="button button-initial" id="medium" draggable="true">中</div>
+            <div class="button button-initial" id="strong" draggable="true">強</div>
+            <div class="button button-initial" id="left" draggable="true">←</div>
+            <div class="button button-initial" id="down" draggable="true">↓</div>
+            <div class="button button-initial" id="right" draggable="true">→</div>
+            <div class="button button-initial" id="up" draggable="true">↑</div>
+            <div class="button button-initial" id="assist" draggable="true">アシスト</div>
+            <div class="button button-initial" id="sp" draggable="true">SP</div>
+            <div class="button button-initial" id="throw" draggable="true">投げ</div>
+            <div class="button button-initial" id="sa" draggable="true">SA</div>
+            <div class="button button-initial" id="extra1" draggable="true">その他1</div>
+            <div class="button button-initial" id="extra2" draggable="true">その他2</div>
         </div>
     </div>
 
     <script>
+        /* 図面のサイズに合わせてボタンのサイズを調整する関数 */
         function adjustSizes() {
             let controller = document.getElementById('controller');
             let buttons = document.querySelectorAll('.button');
-            let scaleFactor = controller.clientWidth / 950;
-            let size = Math.max(40, 70 * scaleFactor); // 最小サイズ40px, 拡縮対応
+            let scaleFactor = controller.clientWidth / 950; // 基準サイズからのスケール調整
             buttons.forEach(button => {
+                let size = 70 * scaleFactor;
                 button.style.width = size + 'px';
                 button.style.height = size + 'px';
                 button.style.fontSize = (size * 0.4) + 'px';
-                button.style.borderRadius = '50%';
+                button.style.borderRadius = '50%'; // 円形維持
             });
         }
         
+        /* ウィンドウのサイズ変更時にボタンサイズを再調整 */
         window.addEventListener('resize', adjustSizes);
         window.addEventListener('load', adjustSizes);
         
+        /* PC向けドラッグ＆ドロップ機能 */
         document.querySelectorAll('.button').forEach(button => {
-            button.addEventListener('mousedown', startDrag);
-            button.addEventListener('touchstart', startDrag);
+            button.addEventListener('dragstart', (event) => {
+                event.dataTransfer.setData('text/plain', event.target.id);
+                event.dataTransfer.effectAllowed = "move";
+            });
         });
 
-        function startDrag(event) {
+        document.getElementById('controller').addEventListener('dragover', (event) => {
             event.preventDefault();
-            let button = event.target;
-            let isTouch = event.type === 'touchstart';
-            let startX = isTouch ? event.touches[0].pageX : event.pageX;
-            let startY = isTouch ? event.touches[0].pageY : event.pageY;
-            let offsetX = startX - button.getBoundingClientRect().left;
-            let offsetY = startY - button.getBoundingClientRect().top;
+        });
 
-            function moveButton(moveEvent) {
-                let moveX = isTouch ? moveEvent.touches[0].pageX : moveEvent.pageX;
-                let moveY = isTouch ? moveEvent.touches[0].pageY : moveEvent.pageY;
-                let controller = document.getElementById('controller');
-                let controllerRect = controller.getBoundingClientRect();
-                let newX = moveX - controllerRect.left - offsetX;
-                let newY = moveY - controllerRect.top - offsetY;
-
-                button.style.left = `${Math.max(0, Math.min(controllerRect.width - button.offsetWidth, newX))}px`;
-                button.style.top = `${Math.max(0, Math.min(controllerRect.height - button.offsetHeight, newY))}px`;
-                button.style.position = 'absolute';
+        document.getElementById('controller').addEventListener('drop', (event) => {
+            event.preventDefault();
+            let buttonId = event.dataTransfer.getData('text/plain');
+            let button = document.getElementById(buttonId);
+            let controllerRect = event.target.getBoundingClientRect();
+            button.style.left = (event.clientX - controllerRect.left - button.offsetWidth / 2) + 'px';
+            button.style.top = (event.clientY - controllerRect.top - button.offsetHeight / 2) + 'px';
+            button.style.position = 'absolute';
+            if (!controller.contains(button)) {
                 controller.appendChild(button);
             }
-
-            function stopDrag() {
-                document.removeEventListener('mousemove', moveButton);
-                document.removeEventListener('mouseup', stopDrag);
-                document.removeEventListener('touchmove', moveButton);
-                document.removeEventListener('touchend', stopDrag);
-            }
-
-            document.addEventListener(isTouch ? 'touchmove' : 'mousemove', moveButton);
-            document.addEventListener(isTouch ? 'touchend' : 'mouseup', stopDrag);
-        }
+        });
+        
+        /* スマホ向けタッチ操作でのドラッグ移動機能 */
+        document.querySelectorAll('.button').forEach(button => {
+            // タッチ開始時に、タッチ位置とボタンの相対位置を記録
+            button.addEventListener('touchstart', (event) => {
+                let touch = event.touches[0];
+                let rect = button.getBoundingClientRect();
+                button.dataset.touchOffsetX = touch.clientX - rect.left;
+                button.dataset.touchOffsetY = touch.clientY - rect.top;
+            });
+            
+            // タッチ移動時に、ボタンを動かす
+            button.addEventListener('touchmove', (event) => {
+                event.preventDefault(); // ページスクロール防止
+                let touch = event.touches[0];
+                let controller = document.getElementById('controller');
+                let controllerRect = controller.getBoundingClientRect();
+                let offsetX = parseFloat(button.dataset.touchOffsetX);
+                let offsetY = parseFloat(button.dataset.touchOffsetY);
+                let left = touch.clientX - controllerRect.left - offsetX;
+                let top = touch.clientY - controllerRect.top - offsetY;
+                button.style.left = left + 'px';
+                button.style.top = top + 'px';
+                button.style.position = 'absolute';
+                // もしコントローラーエリアに未配置なら追加
+                if (!controller.contains(button)) {
+                    controller.appendChild(button);
+                }
+            });
+        });
     </script>
 </body>
 </html>
