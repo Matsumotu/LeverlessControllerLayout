@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>レバーレスコントローラー設定</title>
     <style>
+        /* ページ全体のレイアウト設定 */
         body {
             display: flex;
             flex-direction: column;
@@ -14,6 +15,7 @@
             background-color: #f4f4f4;
             margin: 0;
         }
+        /* コンテンツ全体のコンテナ設定 */
         #container {
             width: 100vw;
             height: 80vh;
@@ -22,10 +24,11 @@
             align-items: center;
             justify-content: space-between;
         }
+        /* レバーレスコントローラーの画像を配置するエリア（中央揃え） */
         #controller {
-            width: 95%;
+            width: 95%; /* 画面のほぼ全幅を使う */
             height: auto;
-            aspect-ratio: 16 / 9;
+            aspect-ratio: 16 / 9; /* 比率を保持 */
             background: url('controller.png') no-repeat center center;
             background-size: contain;
             position: relative;
@@ -34,9 +37,10 @@
             align-items: center;
             justify-content: center;
         }
+        /* ボタンの基本スタイル（円形ボタン） */
         .button {
             background: lightblue;
-            border-radius: 50%;
+            border-radius: 50%; /* 完全な円形にする */
             text-align: center;
             font-weight: bold;
             cursor: grab;
@@ -46,10 +50,13 @@
             align-items: center;
             justify-content: center;
         }
+        /* ボタンコンテナ（初期配置用、複数段対応） */
         #buttons-container {
             width: 95%;
             display: flex;
-            justify-content: space-around;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
             margin-top: 10px;
         }
         .button-initial {
@@ -59,75 +66,45 @@
 </head>
 <body>
     <div id="container">
+        <!-- コントローラー画像エリア（中央揃え） -->
         <div id="controller"></div>
+        
+        <!-- 初期配置されるボタンエリア（複数段に対応） -->
         <div id="buttons-container">
             <div class="button button-initial" id="weak" draggable="true">弱</div>
             <div class="button button-initial" id="medium" draggable="true">中</div>
             <div class="button button-initial" id="strong" draggable="true">強</div>
+            <div class="button button-initial" id="left" draggable="true">←</div>
+            <div class="button button-initial" id="down" draggable="true">↓</div>
+            <div class="button button-initial" id="right" draggable="true">→</div>
+            <div class="button button-initial" id="up" draggable="true">↑</div>
+            <div class="button button-initial" id="assist" draggable="true">アシスト</div>
+            <div class="button button-initial" id="sp" draggable="true">SP</div>
+            <div class="button button-initial" id="throw" draggable="true">投げ</div>
+            <div class="button button-initial" id="sa" draggable="true">SA</div>
+            <div class="button button-initial" id="extra1" draggable="true">その他1</div>
+            <div class="button button-initial" id="extra2" draggable="true">その他2</div>
         </div>
     </div>
 
     <script>
+        /* 図面のサイズに合わせてボタンのサイズを調整する関数 */
         function adjustSizes() {
             let controller = document.getElementById('controller');
             let buttons = document.querySelectorAll('.button');
-            let scaleFactor = controller.clientWidth / 950; // 基準サイズからのスケーリング
+            let scaleFactor = controller.clientWidth / 950; // 基準サイズからのスケール調整
             buttons.forEach(button => {
                 let size = 70 * scaleFactor;
                 button.style.width = size + 'px';
                 button.style.height = size + 'px';
                 button.style.fontSize = (size * 0.4) + 'px';
-                button.style.borderRadius = '50%';
+                button.style.borderRadius = '50%'; // 円形維持
             });
         }
         
+        /* ウィンドウのサイズ変更時にボタンサイズを再調整 */
         window.addEventListener('resize', adjustSizes);
         window.addEventListener('load', adjustSizes);
-        
-        document.querySelectorAll('.button').forEach(button => {
-            button.addEventListener('dragstart', (event) => {
-                event.dataTransfer.setData('text/plain', event.target.id);
-                event.dataTransfer.effectAllowed = "move";
-            });
-        });
-
-        document.getElementById('controller').addEventListener('dragover', (event) => {
-            event.preventDefault();
-        });
-
-        document.getElementById('controller').addEventListener('drop', (event) => {
-            event.preventDefault();
-            let buttonId = event.dataTransfer.getData('text/plain');
-            let button = document.getElementById(buttonId);
-            let controllerRect = event.target.getBoundingClientRect();
-            button.style.left = (event.clientX - controllerRect.left - button.offsetWidth / 2) + 'px';
-            button.style.top = (event.clientY - controllerRect.top - button.offsetHeight / 2) + 'px';
-            button.style.position = 'absolute';
-            if (!controller.contains(button)) {
-                controller.appendChild(button);
-            }
-        });
-
-        document.querySelectorAll('.button').forEach(button => {
-            button.addEventListener('touchstart', (event) => {
-                let touch = event.touches[0];
-                button.dataset.offsetX = touch.clientX - button.getBoundingClientRect().left;
-                button.dataset.offsetY = touch.clientY - button.getBoundingClientRect().top;
-            });
-
-            button.addEventListener('touchmove', (event) => {
-                event.preventDefault();
-                let touch = event.touches[0];
-                let controller = document.getElementById('controller');
-                let controllerRect = controller.getBoundingClientRect();
-                button.style.left = (touch.clientX - controllerRect.left - button.offsetWidth / 2) + 'px';
-                button.style.top = (touch.clientY - controllerRect.top - button.offsetHeight / 2) + 'px';
-                button.style.position = 'absolute';
-                if (!controller.contains(button)) {
-                    controller.appendChild(button);
-                }
-            });
-        });
     </script>
 </body>
 </html>
