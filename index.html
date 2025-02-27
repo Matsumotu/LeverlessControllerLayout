@@ -53,15 +53,17 @@
             flex-shrink: 0;
             position: absolute;
         }
-        /* ボタンコンテナ（横一列配置、折り返しあり） */
+        /* ボタンコンテナ（横一列に固定、スクロール可能） */
         #buttons-container {
             width: 95%;
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             justify-content: center;
             gap: 10px;
+            overflow-x: auto;
             padding: 10px 0;
             position: relative;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -101,57 +103,33 @@
             let buttonId = event.dataTransfer.getData('text/plain');
             let button = document.getElementById(buttonId);
             let controllerRect = event.target.getBoundingClientRect();
-            let offsetX = Math.round((event.clientX - controllerRect.left - button.offsetWidth / 2) / 10) * 10;
-            let offsetY = Math.round((event.clientY - controllerRect.top - button.offsetHeight / 2) / 10) * 10;
-            button.style.left = offsetX + 'px';
-            button.style.top = offsetY + 'px';
+            let offsetX = event.clientX - controllerRect.left - button.offsetWidth / 2;
+            let offsetY = event.clientY - controllerRect.top - button.offsetHeight / 2;
+            button.style.left = `${offsetX}px`;
+            button.style.top = `${offsetY}px`;
             button.style.position = 'absolute';
             event.target.appendChild(button);
-            saveButtonPositions();
         });
 
         document.querySelectorAll('.button').forEach(button => {
             button.addEventListener('touchstart', (event) => {
                 let touch = event.touches[0];
-                button.dataset.offsetX = touch.clientX - button.getBoundingClientRect().left;
-                button.dataset.offsetY = touch.clientY - button.getBoundingClientRect().top;
+                button.dataset.offsetX = touch.pageX - button.getBoundingClientRect().left;
+                button.dataset.offsetY = touch.pageY - button.getBoundingClientRect().top;
             });
             button.addEventListener('touchmove', (event) => {
                 event.preventDefault();
                 let touch = event.touches[0];
                 let controller = document.getElementById('controller');
                 let controllerRect = controller.getBoundingClientRect();
-                let offsetX = Math.round((touch.clientX - controllerRect.left - button.offsetWidth / 2) / 10) * 10;
-                let offsetY = Math.round((touch.clientY - controllerRect.top - button.offsetHeight / 2) / 10) * 10;
-                button.style.left = offsetX + 'px';
-                button.style.top = offsetY + 'px';
+                let offsetX = touch.pageX - controllerRect.left - button.offsetWidth / 2;
+                let offsetY = touch.pageY - controllerRect.top - button.offsetHeight / 2;
+                button.style.left = `${offsetX}px`;
+                button.style.top = `${offsetY}px`;
                 button.style.position = 'absolute';
                 controller.appendChild(button);
-                saveButtonPositions();
             });
         });
-
-        function saveButtonPositions() {
-            let positions = {};
-            document.querySelectorAll('.button').forEach(button => {
-                positions[button.id] = { left: button.style.left, top: button.style.top };
-            });
-            localStorage.setItem('buttonPositions', JSON.stringify(positions));
-        }
-
-        function loadButtonPositions() {
-            let positions = JSON.parse(localStorage.getItem('buttonPositions')) || {};
-            document.querySelectorAll('.button').forEach(button => {
-                if (positions[button.id]) {
-                    button.style.left = positions[button.id].left;
-                    button.style.top = positions[button.id].top;
-                    button.style.position = 'absolute';
-                    document.getElementById('controller').appendChild(button);
-                }
-            });
-        }
-
-        window.addEventListener('load', loadButtonPositions);
     </script>
 </body>
 </html>
