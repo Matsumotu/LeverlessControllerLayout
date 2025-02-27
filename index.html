@@ -34,16 +34,19 @@
             justify-content: center;
         }
         .button {
-            width: 60px;
-            height: 60px;
+            width: 7%; /* コントローラーのサイズに対する割合で設定 */
+            height: 7%;
             background: lightblue;
             border-radius: 50%;
             text-align: center;
-            line-height: 60px;
+            font-size: 1.2vw;
             font-weight: bold;
             cursor: grab;
             position: absolute;
             touch-action: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         #buttons-container {
             width: 80%;
@@ -67,9 +70,23 @@
     </div>
 
     <script>
+        function adjustButtonSizes() {
+            let controller = document.getElementById('controller');
+            let buttons = document.querySelectorAll('.button');
+            buttons.forEach(button => {
+                button.style.width = (controller.clientWidth * 0.07) + 'px';
+                button.style.height = (controller.clientHeight * 0.07) + 'px';
+                button.style.fontSize = (controller.clientWidth * 0.03) + 'px';
+            });
+        }
+        
+        window.addEventListener('resize', adjustButtonSizes);
+        window.addEventListener('load', adjustButtonSizes);
+        
         document.querySelectorAll('.button').forEach(button => {
             button.addEventListener('dragstart', (event) => {
                 event.dataTransfer.setData('text/plain', event.target.id);
+                event.dataTransfer.effectAllowed = "move";
             });
         });
 
@@ -81,12 +98,13 @@
             event.preventDefault();
             let buttonId = event.dataTransfer.getData('text/plain');
             let button = document.getElementById(buttonId);
-            let rect = button.getBoundingClientRect();
             let controllerRect = event.target.getBoundingClientRect();
-            button.style.left = (event.clientX - controllerRect.left - rect.width / 2) + 'px';
-            button.style.top = (event.clientY - controllerRect.top - rect.height / 2) + 'px';
+            button.style.left = (event.clientX - controllerRect.left - button.offsetWidth / 2) + 'px';
+            button.style.top = (event.clientY - controllerRect.top - button.offsetHeight / 2) + 'px';
             button.style.position = 'absolute';
-            document.getElementById('controller').appendChild(button);
+            if (!document.getElementById('controller').contains(button)) {
+                document.getElementById('controller').appendChild(button);
+            }
         });
 
         document.querySelectorAll('.button').forEach(button => {
@@ -101,10 +119,12 @@
                 let touch = event.touches[0];
                 let controller = document.getElementById('controller');
                 let controllerRect = controller.getBoundingClientRect();
-                button.style.left = (touch.clientX - controllerRect.left - button.dataset.offsetX) + 'px';
-                button.style.top = (touch.clientY - controllerRect.top - button.dataset.offsetY) + 'px';
+                button.style.left = (touch.clientX - controllerRect.left - button.offsetWidth / 2) + 'px';
+                button.style.top = (touch.clientY - controllerRect.top - button.offsetHeight / 2) + 'px';
                 button.style.position = 'absolute';
-                controller.appendChild(button);
+                if (!controller.contains(button)) {
+                    controller.appendChild(button);
+                }
             });
         });
     </script>
