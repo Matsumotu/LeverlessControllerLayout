@@ -24,7 +24,8 @@
         }
         #controller {
             width: 95%;
-            height: 60%;
+            height: auto;
+            aspect-ratio: 16 / 9;
             background: url('controller.png') no-repeat center center;
             background-size: contain;
             position: relative;
@@ -67,11 +68,12 @@
     </div>
 
     <script>
-        function adjustButtonSizes() {
+        function adjustSizes() {
             let controller = document.getElementById('controller');
             let buttons = document.querySelectorAll('.button');
-            let size = Math.min(controller.clientWidth * 0.1, controller.clientHeight * 0.1);
+            let scaleFactor = controller.clientWidth / 950; // 基準サイズからのスケーリング
             buttons.forEach(button => {
+                let size = 70 * scaleFactor;
                 button.style.width = size + 'px';
                 button.style.height = size + 'px';
                 button.style.fontSize = (size * 0.4) + 'px';
@@ -79,8 +81,8 @@
             });
         }
         
-        window.addEventListener('resize', adjustButtonSizes);
-        window.addEventListener('load', adjustButtonSizes);
+        window.addEventListener('resize', adjustSizes);
+        window.addEventListener('load', adjustSizes);
         
         document.querySelectorAll('.button').forEach(button => {
             button.addEventListener('dragstart', (event) => {
