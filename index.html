@@ -52,7 +52,7 @@
             height: 60px;
             font-size: 16px;
             flex-shrink: 0;
-            position: absolute;
+            position: relative;
             touch-action: none;
         }
         /* ボタンコンテナ（横一列に固定、スクロール可能） */
@@ -99,14 +99,14 @@
             event.preventDefault();
             let button = event.target;
             let isTouch = event.type === 'touchstart';
-            let startX = isTouch ? event.touches[0].clientX : event.clientX;
-            let startY = isTouch ? event.touches[0].clientY : event.clientY;
+            let startX = isTouch ? event.touches[0].pageX : event.pageX;
+            let startY = isTouch ? event.touches[0].pageY : event.pageY;
             let offsetX = startX - button.getBoundingClientRect().left;
             let offsetY = startY - button.getBoundingClientRect().top;
 
             function moveButton(moveEvent) {
-                let moveX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
-                let moveY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
+                let moveX = isTouch ? moveEvent.touches[0].pageX : moveEvent.pageX;
+                let moveY = isTouch ? moveEvent.touches[0].pageY : moveEvent.pageY;
                 let controller = document.getElementById('controller');
                 let controllerRect = controller.getBoundingClientRect();
                 let newX = moveX - controllerRect.left - offsetX;
